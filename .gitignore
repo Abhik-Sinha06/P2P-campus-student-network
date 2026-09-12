@@ -1,0 +1,4 @@
+node_modules
+.db_fallback.json
+.env.local
+.next/

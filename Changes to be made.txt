@@ -1,0 +1,5 @@
+1) Already fulfilled ('completed') requests don't need to be display anymore in feed. remove them
+
+2) profile icon is inactive. move 'my exchanges' and 'karma & trust' under profile
+
+3) Store all users' location (room number) with some kind of verification system 
