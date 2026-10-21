@@ -30,6 +30,17 @@ export async function POST(request) {
       return NextResponse.json({ error: 'You cannot make an offer on your own request' }, { status: 400 });
     }
 
+    // Gatekeeping: Helper must have verified room number
+    const helperRes = await query('SELECT role, room_status FROM users WHERE user_id = $1', [user.user_id]);
+    const helperUser = helperRes.rows[0];
+    if (helperUser && helperUser.role !== 'admin' && helperUser.room_status !== 'verified') {
+      return NextResponse.json({
+        error: 'Hostel room verification required! As a campus security measure, please enter your hostel room number in your Profile and get it verified by the Admin before offering help or lending items.',
+        needs_room_verification: true,
+        room_status: helperUser.room_status || 'unverified',
+      }, { status: 403 });
+    }
+
     // Insert offer
     const offerRes = await query(
       `INSERT INTO offers (request_id, helper_id, message, status, offer_date)

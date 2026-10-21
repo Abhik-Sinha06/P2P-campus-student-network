@@ -28,7 +28,9 @@ CREATE TABLE users (
     contact_info VARCHAR(255),
     karma_balance INT DEFAULT 50,
     is_verified BOOLEAN DEFAULT FALSE,
-    status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'warned', 'suspended'))
+    status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'warned', 'suspended')),
+    room_number VARCHAR(20),
+    room_status VARCHAR(20) DEFAULT 'unverified' CHECK (room_status IN ('unverified', 'pending', 'verified'))
 );
 
 -- 2. SKILLS TABLE

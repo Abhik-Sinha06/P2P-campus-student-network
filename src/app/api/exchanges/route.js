@@ -24,6 +24,8 @@ export async function GET(request) {
       ...e,
       has_rated: ratedExchangeIds.has(e.exchange_id),
       user_role: e.requester_id === user.user_id ? 'requester' : 'helper',
+      requester_room: e.requester_room || null,
+      helper_room: e.helper_room || null,
     }));
 
     return NextResponse.json({ exchanges: enriched });

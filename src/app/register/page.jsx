@@ -119,7 +119,7 @@ export default function RegisterPage() {
 
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-5">
         {error && (
-          <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl">
+          <div id="domain-error-msg" className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl domain-error-msg">
             {error}
           </div>
         )}
@@ -139,6 +139,7 @@ export default function RegisterPage() {
               <div className="relative">
                 <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
+                  id="name"
                   type="text"
                   required
                   value={name}
@@ -156,6 +157,7 @@ export default function RegisterPage() {
               <div className="relative">
                 <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
+                  id="email"
                   type="email"
                   required
                   value={email}
@@ -207,6 +209,7 @@ export default function RegisterPage() {
               <div className="relative">
                 <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
+                  id="password"
                   type="password"
                   required
                   minLength={6}
@@ -219,6 +222,7 @@ export default function RegisterPage() {
             </div>
 
             <button
+              id="register-submit-btn"
               type="submit"
               disabled={loading}
               className="w-full py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow transition-all disabled:opacity-50 flex items-center justify-center space-x-1.5"

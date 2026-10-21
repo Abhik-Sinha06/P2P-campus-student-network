@@ -274,12 +274,22 @@ export default function RequestDetailPage() {
             </div>
           </div>
 
-          {/* Contact Privacy Box */}
-          <div className="text-right text-xs">
-            <p className="text-[11px] text-slate-400">Direct Contact:</p>
-            <p className="font-semibold text-slate-800">
-              {request.requester_contact}
-            </p>
+          {/* Contact & Room Privacy Box */}
+          <div className="text-right text-xs space-y-1">
+            <div>
+              <p className="text-[11px] text-slate-400">Direct Contact:</p>
+              <p className="font-semibold text-slate-800">
+                {request.requester_contact}
+              </p>
+            </div>
+            {canSeeContact && request.requester_room && (
+              <div className="pt-0.5 border-t border-slate-100">
+                <p className="text-[11px] text-slate-400">Hostel Room:</p>
+                <p className="font-bold text-sky-700">
+                  📍 {request.requester_room}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -298,30 +308,45 @@ export default function RequestDetailPage() {
           </p>
 
           {currentUser ? (
-            <form onSubmit={handleMakeOffer} className="space-y-3">
-              <textarea
-                rows={3}
-                required
-                value={offerMsg}
-                onChange={(e) => setOfferMsg(e.target.value)}
-                placeholder="e.g. I have a spare calculator and can meet you at the library entrance at 10 AM..."
-                className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none leading-relaxed"
-              />
-
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  disabled={submittingOffer || hasAlreadyOffered}
-                  className="px-5 py-2 text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white rounded-xl shadow transition-colors disabled:opacity-50"
+            currentUser.role !== 'admin' && currentUser.room_status !== 'verified' ? (
+              <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-xs text-amber-900 space-y-2">
+                <p className="font-bold">Hostel Room Verification Required</p>
+                <p className="text-amber-800 leading-relaxed">
+                  As a campus security measure (to protect students lending items or study equipment), you must enter your hostel room number in your Profile and receive Admin verification before offering help.
+                </p>
+                <NextLink
+                  href="/profile"
+                  className="inline-flex items-center space-x-1 font-bold text-sky-700 hover:text-sky-900 underline"
                 >
-                  {hasAlreadyOffered
-                    ? 'Offer Already Submitted'
-                    : submittingOffer
-                    ? 'Sending Offer...'
-                    : 'Submit Offer'}
-                </button>
+                  <span>Go to Profile to Register Room ({currentUser.room_status === 'pending' ? 'Pending Admin Approval' : 'Not Registered'}) →</span>
+                </NextLink>
               </div>
-            </form>
+            ) : (
+              <form onSubmit={handleMakeOffer} className="space-y-3">
+                <textarea
+                  rows={3}
+                  required
+                  value={offerMsg}
+                  onChange={(e) => setOfferMsg(e.target.value)}
+                  placeholder="e.g. I have a spare calculator and can meet you at the library entrance at 10 AM..."
+                  className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none leading-relaxed"
+                />
+
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={submittingOffer || hasAlreadyOffered}
+                    className="px-5 py-2 text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white rounded-xl shadow transition-colors disabled:opacity-50"
+                  >
+                    {hasAlreadyOffered
+                      ? 'Offer Already Submitted'
+                      : submittingOffer
+                      ? 'Sending Offer...'
+                      : 'Submit Offer'}
+                  </button>
+                </div>
+              </form>
+            )
           ) : (
             <div className="p-4 bg-slate-50 rounded-2xl text-center space-y-2">
               <p className="text-xs text-slate-600">Please log in with your verified VIT email to offer help.</p>

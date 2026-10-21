@@ -31,6 +31,8 @@ function initFallbackDb() {
         karma_balance: 70,
         is_verified: true,
         status: 'active',
+        room_number: 'B-325',
+        room_status: 'verified',
       },
       {
         user_id: 2,
@@ -43,6 +45,8 @@ function initFallbackDb() {
         karma_balance: 90,
         is_verified: true,
         status: 'active',
+        room_number: 'A-412',
+        room_status: 'verified',
       },
       {
         user_id: 3,
@@ -55,6 +59,8 @@ function initFallbackDb() {
         karma_balance: 50,
         is_verified: true,
         status: 'active',
+        room_number: 'C-215',
+        room_status: 'verified',
       },
       {
         user_id: 4,
@@ -67,6 +73,8 @@ function initFallbackDb() {
         karma_balance: 40,
         is_verified: true,
         status: 'active',
+        room_number: 'D-630',
+        room_status: 'verified',
       },
       {
         user_id: 5,
@@ -79,6 +87,8 @@ function initFallbackDb() {
         karma_balance: 100,
         is_verified: true,
         status: 'active',
+        room_number: null,
+        room_status: 'verified',
       },
     ],
     skills: [
@@ -357,6 +367,11 @@ function runFallbackQuery(sql, params) {
     return { rows: user ? [{ ...user }] : [], rowCount: user ? 1 : 0 };
   }
 
+  // 2b. SELECT All Users
+  if (upper.includes('FROM USERS') && !upper.startsWith('INSERT') && !upper.startsWith('UPDATE') && !upper.startsWith('DELETE')) {
+    return { rows: fallbackDb.users.map(u => ({ ...u })), rowCount: fallbackDb.users.length };
+  }
+
   // 3. INSERT INTO Users
   if (upper.startsWith('INSERT INTO USERS')) {
     const newId = (fallbackDb.users.reduce((max, u) => Math.max(max, u.user_id), 0) || 0) + 1;
@@ -371,6 +386,8 @@ function runFallbackQuery(sql, params) {
       karma_balance: params[6] || 50,
       is_verified: params[7] !== undefined ? params[7] : false,
       status: 'active',
+      room_number: params[8] || null,
+      room_status: params[9] || 'unverified',
     };
     fallbackDb.users.push(newUser);
     saveFallbackDb();
@@ -383,6 +400,47 @@ function runFallbackQuery(sql, params) {
       const email = params[0]?.toLowerCase();
       const user = fallbackDb.users.find(u => u.email.toLowerCase() === email);
       if (user) user.is_verified = true;
+      saveFallbackDb();
+      return { rows: user ? [user] : [], rowCount: user ? 1 : 0 };
+    }
+    if (upper.includes('SET ROOM_NUMBER =') && upper.includes('ROOM_STATUS =')) {
+      const roomNum = params[0];
+      const roomStatus = params[1];
+      const id = parseInt(params[2], 10);
+      const user = fallbackDb.users.find(u => u.user_id === id);
+      if (user) {
+        user.room_number = roomNum;
+        user.room_status = roomStatus;
+      }
+      saveFallbackDb();
+      return { rows: user ? [user] : [], rowCount: user ? 1 : 0 };
+    }
+    if (upper.includes("SET ROOM_STATUS = 'VERIFIED'")) {
+      const id = parseInt(params[0], 10);
+      const user = fallbackDb.users.find(u => u.user_id === id);
+      if (user) {
+        user.room_status = 'verified';
+      }
+      saveFallbackDb();
+      return { rows: user ? [user] : [], rowCount: user ? 1 : 0 };
+    }
+    if (upper.includes("SET ROOM_STATUS = 'UNVERIFIED'")) {
+      const id = parseInt(params[0], 10);
+      const user = fallbackDb.users.find(u => u.user_id === id);
+      if (user) {
+        user.room_status = 'unverified';
+        user.room_number = null;
+      }
+      saveFallbackDb();
+      return { rows: user ? [user] : [], rowCount: user ? 1 : 0 };
+    }
+    if (upper.includes('SET ROOM_STATUS =')) {
+      const roomStatus = params[0];
+      const id = parseInt(params[1], 10);
+      const user = fallbackDb.users.find(u => u.user_id === id);
+      if (user) {
+        user.room_status = roomStatus;
+      }
       saveFallbackDb();
       return { rows: user ? [user] : [], rowCount: user ? 1 : 0 };
     }
@@ -576,8 +634,10 @@ function runFallbackQuery(sql, params) {
           category: req?.category,
           requester_name: requester?.name,
           requester_contact: requester?.contact_info,
+          requester_room: requester?.room_number || null,
           helper_name: helper?.name,
           helper_contact: helper?.contact_info,
+          helper_room: helper?.room_number || null,
         }],
         rowCount: 1,
       };
@@ -593,8 +653,10 @@ function runFallbackQuery(sql, params) {
         category: req?.category,
         requester_name: requester?.name,
         requester_contact: requester?.contact_info,
+        requester_room: requester?.room_number || null,
         helper_name: helper?.name,
         helper_contact: helper?.contact_info,
+        helper_room: helper?.room_number || null,
       };
     });
     return { rows: list, rowCount: list.length };

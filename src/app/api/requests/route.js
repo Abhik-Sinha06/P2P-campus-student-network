@@ -61,8 +61,8 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Category, title, and description are required' }, { status: 400 });
     }
 
-    // Check user Karma balance (Must be at least 10 points - FR-3.2.4)
-    const userRes = await query('SELECT karma_balance, status FROM users WHERE user_id = $1', [user.user_id]);
+    // Check user Karma balance and room verification
+    const userRes = await query('SELECT karma_balance, status, room_number, room_status, role FROM users WHERE user_id = $1', [user.user_id]);
     const currentUser = userRes.rows[0];
 
     if (!currentUser) {
@@ -71,6 +71,15 @@ export async function POST(request) {
 
     if (currentUser.status === 'suspended') {
       return NextResponse.json({ error: 'Suspended users cannot post requests' }, { status: 403 });
+    }
+
+    // Gatekeeping: Student room number must be verified by Admin
+    if (currentUser.role !== 'admin' && currentUser.room_status !== 'verified') {
+      return NextResponse.json({
+        error: 'Hostel room verification required! As a campus security measure, please enter your hostel room number in your Profile and get it verified by the Admin before posting requests.',
+        needs_room_verification: true,
+        room_status: currentUser.room_status || 'unverified',
+      }, { status: 403 });
     }
 
     if (currentUser.karma_balance < KARMA_RULES.MIN_REQUIRED_TO_POST) {

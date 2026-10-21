@@ -8,13 +8,13 @@
 -- Hash for Admin@123: $2a$10$WpP69dM7hP8kO4f1H5s9YeF7A8d1B2c3E4f5G6h7I8j9K0l1M2n3O
 
 -- 1. SEED USERS
-INSERT INTO users (name, email, password_hash, role, year, contact_info, karma_balance, is_verified, status)
+INSERT INTO users (name, email, password_hash, role, year, contact_info, karma_balance, is_verified, status, room_number, room_status)
 VALUES 
-('Abhik Sinha', 'abhik@vitstudent.ac.in', '$2a$10$e0my6m1fJz6Kk8U5cRk3ueE7J3Z3/2l.mS8F.4e7s9w8r5v1t9p0q', 'student', 2, '+91 98765 43210 (WhatsApp)', 70, TRUE, 'active'),
-('Priya Sharma', 'priya.s@vitstudent.ac.in', '$2a$10$e0my6m1fJz6Kk8U5cRk3ueE7J3Z3/2l.mS8F.4e7s9w8r5v1t9p0q', 'student', 3, '+91 98111 22233 (Telegram: @priyavit)', 90, TRUE, 'active'),
-('Rahul Kumar', 'rahul.k@vitstudent.ac.in', '$2a$10$e0my6m1fJz6Kk8U5cRk3ueE7J3Z3/2l.mS8F.4e7s9w8r5v1t9p0q', 'student', 1, '+91 97222 33344', 50, TRUE, 'active'),
-('Sneha Patel', 'sneha.p@vitstudent.ac.in', '$2a$10$e0my6m1fJz6Kk8U5cRk3ueE7J3Z3/2l.mS8F.4e7s9w8r5v1t9p0q', 'student', 2, '+91 96333 44455', 40, TRUE, 'active'),
-('System Administrator', 'admin@vitstudent.ac.in', '$2a$10$e0my6m1fJz6Kk8U5cRk3ueE7J3Z3/2l.mS8F.4e7s9w8r5v1t9p0q', 'admin', 4, 'admin-office@vitstudent.ac.in', 100, TRUE, 'active');
+('Abhik Sinha', 'abhik@vitstudent.ac.in', '$2a$10$e0my6m1fJz6Kk8U5cRk3ueE7J3Z3/2l.mS8F.4e7s9w8r5v1t9p0q', 'student', 2, '+91 98765 43210 (WhatsApp)', 70, TRUE, 'active', 'B-325', 'verified'),
+('Priya Sharma', 'priya.s@vitstudent.ac.in', '$2a$10$e0my6m1fJz6Kk8U5cRk3ueE7J3Z3/2l.mS8F.4e7s9w8r5v1t9p0q', 'student', 3, '+91 98111 22233 (Telegram: @priyavit)', 90, TRUE, 'active', 'A-412', 'verified'),
+('Rahul Kumar', 'rahul.k@vitstudent.ac.in', '$2a$10$e0my6m1fJz6Kk8U5cRk3ueE7J3Z3/2l.mS8F.4e7s9w8r5v1t9p0q', 'student', 1, '+91 97222 33344', 50, TRUE, 'active', 'C-215', 'verified'),
+('Sneha Patel', 'sneha.p@vitstudent.ac.in', '$2a$10$e0my6m1fJz6Kk8U5cRk3ueE7J3Z3/2l.mS8F.4e7s9w8r5v1t9p0q', 'student', 2, '+91 96333 44455', 40, TRUE, 'active', 'D-630', 'verified'),
+('System Administrator', 'admin@vitstudent.ac.in', '$2a$10$e0my6m1fJz6Kk8U5cRk3ueE7J3Z3/2l.mS8F.4e7s9w8r5v1t9p0q', 'admin', 4, 'admin-office@vitstudent.ac.in', 100, TRUE, 'active', NULL, 'verified');
 
 -- 2. SEED SKILLS
 INSERT INTO skills (skill_name) VALUES 

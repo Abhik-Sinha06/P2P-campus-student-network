@@ -219,6 +219,7 @@ export default function MyExchangesPage() {
               const isRequester = ex.user_role === 'requester';
               const partnerName = isRequester ? ex.helper_name : ex.requester_name;
               const partnerContact = isRequester ? ex.helper_contact : ex.requester_contact;
+              const partnerRoom = isRequester ? ex.helper_room : ex.requester_room;
               const partnerId = isRequester ? ex.helper_id : ex.requester_id;
 
               return (
@@ -248,8 +249,8 @@ export default function MyExchangesPage() {
                       </div>
                     )}
 
-                    {/* Matched Partner Contact info (NFR-5.3: revealed only after match is accepted) */}
-                    <div className="p-3 bg-slate-50 rounded-xl space-y-1 text-xs">
+                    {/* Matched Partner Contact & Room info (Security Measure for Item Lending) */}
+                    <div className="p-3 bg-slate-50 rounded-xl space-y-1.5 text-xs">
                       <div className="flex items-center justify-between">
                         <span className="text-[11px] text-slate-400 font-medium">Partner:</span>
                         <span className="font-bold text-slate-800">{partnerName}</span>
@@ -261,6 +262,14 @@ export default function MyExchangesPage() {
                           <span>{partnerContact || 'Not provided'}</span>
                         </span>
                       </div>
+                      {partnerRoom && (
+                        <div className="flex items-center justify-between pt-1 border-t border-slate-200/60">
+                          <span className="text-[11px] text-slate-400 font-medium">Hostel Room:</span>
+                          <span className="font-bold text-amber-900 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/80">
+                            📍 {partnerRoom}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
 

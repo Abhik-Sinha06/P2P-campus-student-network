@@ -80,6 +80,7 @@ export default function ItemsPage() {
         </div>
 
         <button
+          id="open-list-item-btn"
           onClick={() => setShowAddModal(true)}
           className="inline-flex items-center space-x-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition-colors"
         >
@@ -182,6 +183,7 @@ export default function ItemsPage() {
                   Item Name & Model
                 </label>
                 <input
+                  id="item-name"
                   type="text"
                   required
                   value={itemName}
@@ -196,6 +198,7 @@ export default function ItemsPage() {
                   Condition
                 </label>
                 <select
+                  id="condition-select"
                   value={condition}
                   onChange={(e) => setCondition(e.target.value)}
                   className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none font-medium"
@@ -243,6 +246,7 @@ export default function ItemsPage() {
                   Cancel
                 </button>
                 <button
+                  id="submit-item-btn"
                   type="submit"
                   disabled={submitting}
                   className="flex-1 py-2 text-xs font-semibold bg-sky-600 hover:bg-sky-700 text-white rounded-xl shadow disabled:opacity-50"

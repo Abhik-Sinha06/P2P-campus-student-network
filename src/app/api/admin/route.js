@@ -13,19 +13,21 @@ export async function GET(request) {
     const reportsRes = await query('SELECT * FROM reports ORDER BY report_id DESC');
 
     // 2. Fetch users summary
-    const usersRes = await query('SELECT user_id, name, email, role, year, karma_balance, status FROM users ORDER BY user_id ASC');
+    const usersRes = await query('SELECT user_id, name, email, role, year, karma_balance, status, room_number, room_status FROM users ORDER BY user_id ASC');
 
     // 3. Platform metrics
     const stats = {
       total_students: usersRes.rows.filter(u => u.role === 'student').length,
       open_reports: reportsRes.rows.filter(r => r.status === 'pending').length,
       suspended_users: usersRes.rows.filter(u => u.status === 'suspended').length,
+      pending_room_verifications: usersRes.rows.filter(u => u.room_status === 'pending').length,
     };
 
     return NextResponse.json({
       stats,
       reports: reportsRes.rows,
       users: usersRes.rows,
+      pending_rooms: usersRes.rows.filter(u => u.room_status === 'pending'),
     });
   } catch (error) {
     console.error('Admin API error:', error);
@@ -73,6 +75,16 @@ export async function PUT(request) {
     if (action === 'remove_request') {
       await query("UPDATE requests SET status = 'cancelled' WHERE request_id = $1", [request_id]);
       return NextResponse.json({ success: true, message: 'Inappropriate request removed.' });
+    }
+
+    if (action === 'verify_room') {
+      await query("UPDATE users SET room_status = 'verified' WHERE user_id = $1", [user_id]);
+      return NextResponse.json({ success: true, message: 'Hostel room number verified successfully!' });
+    }
+
+    if (action === 'reject_room') {
+      await query("UPDATE users SET room_status = 'unverified', room_number = NULL WHERE user_id = $1", [user_id]);
+      return NextResponse.json({ success: true, message: 'Hostel room verification request rejected.' });
     }
 
     return NextResponse.json({ error: 'Unknown admin action' }, { status: 400 });

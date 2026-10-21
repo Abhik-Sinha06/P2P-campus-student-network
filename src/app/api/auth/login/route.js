@@ -67,6 +67,8 @@ export async function POST(request) {
         contact_info: user.contact_info,
         karma_balance: user.karma_balance,
         status: user.status,
+        room_number: user.room_number,
+        room_status: user.room_status || 'unverified',
       },
       token,
     });

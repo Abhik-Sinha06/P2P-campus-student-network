@@ -80,6 +80,7 @@ export default function CreateRequestPage() {
   }
 
   const hasInsufficientKarma = user && user.karma_balance < 10;
+  const isRoomUnverified = user && user.role !== 'admin' && user.room_status !== 'verified';
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
@@ -100,6 +101,27 @@ export default function CreateRequestPage() {
             Connect with verified peers for academic tutoring, project collaboration, or short-term item lending.
           </p>
         </div>
+
+        {/* Room Verification Warning */}
+        {isRoomUnverified && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start space-x-3 text-xs text-amber-900">
+            <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <p className="font-bold">Hostel Room Verification Required</p>
+              <p className="text-amber-800 leading-relaxed">
+                As a campus security measure (to protect students lending items or study equipment), you must enter your hostel room number in your Profile and receive Admin verification before posting requests.
+              </p>
+              <div className="pt-1">
+                <NextLink
+                  href="/profile"
+                  className="inline-flex items-center space-x-1 font-bold text-sky-700 hover:text-sky-900 underline"
+                >
+                  <span>Go to Profile to Register Room ({user?.room_status === 'pending' ? 'Pending Admin Approval' : 'Not Registered'}) →</span>
+                </NextLink>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Karma Points Info Box */}
         <div className="bg-sky-50 border border-sky-100 rounded-2xl p-4 flex items-start space-x-3 text-xs text-sky-900">
@@ -175,6 +197,7 @@ export default function CreateRequestPage() {
               Request Title <span className="text-rose-500">*</span>
             </label>
             <input
+              id="title"
               type="text"
               required
               value={title}
@@ -196,6 +219,7 @@ export default function CreateRequestPage() {
               Detailed Description <span className="text-rose-500">*</span>
             </label>
             <textarea
+              id="description"
               rows={4}
               required
               value={description}
@@ -283,8 +307,9 @@ export default function CreateRequestPage() {
             </NextLink>
 
             <button
+              id="submit-request-btn"
               type="submit"
-              disabled={submitting || hasInsufficientKarma}
+              disabled={submitting || hasInsufficientKarma || isRoomUnverified}
               className="px-6 py-2.5 text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white rounded-xl shadow-md transition-all disabled:opacity-50 flex items-center space-x-1.5"
             >
               <span>{submitting ? 'Posting...' : 'Publish Request'}</span>

@@ -120,6 +120,7 @@ export default function Navbar() {
                 {/* Live Karma points counter badge */}
                 <NextLink
                   href="/profile"
+                  id="user-karma-balance"
                   className="flex items-center space-x-1.5 bg-amber-50 border border-amber-200/80 px-3 py-1.5 rounded-full text-amber-900 text-xs font-semibold shadow-sm hover:bg-amber-100 transition-colors"
                   title="Your Karma Points balance. Earn +20 for helping peers, spend 10 to get help."
                 >

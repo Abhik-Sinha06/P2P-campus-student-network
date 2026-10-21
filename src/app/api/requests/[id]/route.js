@@ -16,7 +16,7 @@ export async function GET(request, { params }) {
 
     // Fetch requester profile & trust rating
     const userRes = await query(
-      'SELECT user_id, name, email, year, karma_balance, contact_info FROM users WHERE user_id = $1',
+      'SELECT user_id, name, email, year, karma_balance, contact_info, room_number FROM users WHERE user_id = $1',
       [reqData.requester_id]
     );
     const requester = userRes.rows[0] || {};
@@ -34,8 +34,8 @@ export async function GET(request, { params }) {
     const exRes = await query('SELECT * FROM exchanges WHERE request_id = $1', [requestId]);
     const exchange = exRes.rows[0] || null;
 
-    // Contact info privacy rule (NFR-5.3):
-    // Student's contact details shall ONLY be exchanged in-app after a match is accepted.
+    // Contact info and Room privacy rule:
+    // Only visible after a match is accepted
     const isRequester = user && user.user_id === reqData.requester_id;
     const isAcceptedHelper = exchange && user && user.user_id === exchange.helper_id;
     const canSeeContact = isRequester || isAcceptedHelper;
@@ -48,6 +48,7 @@ export async function GET(request, { params }) {
         requester_karma: requester.karma_balance,
         requester_avg_rating: avgScore,
         requester_contact: canSeeContact ? requester.contact_info : 'Available once match is confirmed',
+        requester_room: canSeeContact ? requester.room_number : 'Available once match is confirmed',
       },
       offers: offersRes.rows,
       exchange,

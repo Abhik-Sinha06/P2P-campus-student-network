@@ -94,6 +94,7 @@ export default function HomeFeed() {
             ].map((tab) => (
               <button
                 key={tab.id}
+                id={`tab-${tab.id.toLowerCase()}`}
                 onClick={() => setCategory(tab.id)}
                 className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
                   category === tab.id
@@ -111,6 +112,7 @@ export default function HomeFeed() {
             <div className="relative flex-1 md:w-72">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
+                id="search-input"
                 type="text"
                 placeholder="Search topics, items, skills..."
                 value={search}
@@ -121,6 +123,7 @@ export default function HomeFeed() {
 
             {/* Campus location dropdown */}
             <select
+              id="location-filter"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               className="bg-white border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 outline-none font-medium"
@@ -134,6 +137,7 @@ export default function HomeFeed() {
             </select>
 
             <button
+              id="search-btn"
               type="submit"
               className="bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold px-3 py-2 rounded-xl"
             >

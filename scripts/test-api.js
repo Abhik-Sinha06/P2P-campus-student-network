@@ -188,6 +188,73 @@ async function runTests() {
     });
     assert(adminData.status === 200 && Array.isArray(adminData.data.reports), 'Admin accesses reports and student directory');
 
+    // 9. Hostel Room Security & Verification Measure
+    console.log('\n9. Testing Hostel Room Security & Verification Flow...');
+    // Login as newly created student (from step 2)
+    const newStudentLogin = await request('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        email: testEmail,
+        password: 'Student@123',
+      }),
+    });
+    const newStudentHeaders = { Authorization: `Bearer ${newStudentLogin.data.token}` };
+
+    // A. Unverified student tries to post a request -> Must be rejected (403)
+    const blockedPost = await request('/api/requests', {
+      method: 'POST',
+      headers: newStudentHeaders,
+      body: JSON.stringify({
+        category: 'Electronics',
+        title: 'Need HDMI Cable',
+        description: 'For presentation',
+      }),
+    });
+    assert(blockedPost.status === 403, 'Unverified student blocked from posting requests');
+
+    // B. Student submits invalid room (e.g. room 75 on a floor that only has 50)
+    const invalidRoomRes = await request('/api/profile/room', {
+      method: 'POST',
+      headers: newStudentHeaders,
+      body: JSON.stringify({ block: 'B', floor: 3, room: 75 }),
+    });
+    assert(invalidRoomRes.status === 400, 'Rejects invalid room number exceeding 50 rooms/floor');
+
+    // C. Student submits valid room B-325
+    const validRoomRes = await request('/api/profile/room', {
+      method: 'POST',
+      headers: newStudentHeaders,
+      body: JSON.stringify({ block: 'B', floor: 3, room: 25 }),
+    });
+    assert(validRoomRes.status === 200 && validRoomRes.data.room_status === 'pending', 'Student submitted room B-325 (Status: pending)');
+
+    // D. Admin sees pending room and verifies student
+    const pendingList = await request('/api/admin', { headers: adminHeaders });
+    const pendingStudent = pendingList.data.pending_rooms.find(u => u.email === testEmail);
+    assert(pendingStudent && pendingStudent.room_number === 'B-325', 'Admin sees student room request in pending queue');
+
+    const approveRes = await request('/api/admin', {
+      method: 'PUT',
+      headers: adminHeaders,
+      body: JSON.stringify({ action: 'verify_room', user_id: pendingStudent.user_id }),
+    });
+    assert(approveRes.status === 200, 'Admin approved and verified student room');
+
+    // E. Student can now successfully post requests!
+    const allowedPost = await request('/api/requests', {
+      method: 'POST',
+      headers: newStudentHeaders,
+      body: JSON.stringify({
+        category: 'Electronics',
+        title: 'Need scientific calculator for lab',
+        description: 'Casio fx-991EX for afternoon session',
+        preferred_mode: 'in-person',
+        campus_location: 'Block B hostel lounge',
+        skills_required: '',
+      }),
+    });
+    assert(allowedPost.status === 200 && allowedPost.data.request?.request_id, 'Verified student can now successfully post requests');
+
     console.log('\n======================================================');
     console.log(`📊 TEST RESULTS: ${passed}/${total} TESTS PASSED`);
     console.log('======================================================\n');

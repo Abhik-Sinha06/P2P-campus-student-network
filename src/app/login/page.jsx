@@ -117,6 +117,7 @@ function LoginForm() {
             <div className="relative">
               <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
+                id="email"
                 type="email"
                 required
                 value={email}
@@ -134,6 +135,7 @@ function LoginForm() {
             <div className="relative">
               <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
+                id="password"
                 type="password"
                 required
                 value={password}
@@ -145,6 +147,7 @@ function LoginForm() {
           </div>
 
           <button
+            id="login-btn"
             type="submit"
             disabled={loading}
             className="w-full py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow transition-all disabled:opacity-50 flex items-center justify-center space-x-1.5"
