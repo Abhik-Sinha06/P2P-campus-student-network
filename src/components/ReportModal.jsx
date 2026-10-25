@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { Flag, X, AlertTriangle } from 'lucide-react';
 
 export default function ReportModal({ isOpen, onClose, targetUserId, targetUserName, onSuccess }) {
+  const [category, setCategory] = useState('Unreturned Item');
   const [reason, setReason] = useState('');
+  const [details, setDetails] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -12,7 +14,7 @@ export default function ReportModal({ isOpen, onClose, targetUserId, targetUserN
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!reason.trim()) {
+    if (!reason.trim() && !details.trim()) {
       setError('Please provide a reason for the report');
       return;
     }
@@ -25,7 +27,10 @@ export default function ReportModal({ isOpen, onClose, targetUserId, targetUserN
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           reported_user_id: targetUserId,
-          reason,
+          reported_user_name: targetUserName,
+          category,
+          reason: reason.trim() || category,
+          details: details.trim() || reason.trim(),
         }),
       });
 
@@ -34,7 +39,7 @@ export default function ReportModal({ isOpen, onClose, targetUserId, targetUserN
         throw new Error(data.error || 'Failed to submit report');
       }
 
-      setSuccessMsg('Report submitted to platform moderators for review.');
+      setSuccessMsg('Report submitted & campus admin alerted.');
       setTimeout(() => {
         if (onSuccess) onSuccess();
         onClose();
@@ -81,17 +86,47 @@ export default function ReportModal({ isOpen, onClose, targetUserId, targetUserN
             {successMsg}
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Reason / Incident Description
+                Dispute Category
               </label>
-              <textarea
-                rows={4}
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none bg-white text-slate-800"
+              >
+                <option value="Unreturned Item">Unreturned Item / Overdue</option>
+                <option value="No-show / Missed Session">No-show / Missed Session</option>
+                <option value="Damaged Item">Damaged Item</option>
+                <option value="Inappropriate Conduct">Inappropriate Communication / Conduct</option>
+                <option value="Other Dispute">Other Dispute</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Reason / Summary
+              </label>
+              <input
+                type="text"
                 required
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                placeholder="Describe what occurred (e.g., item not returned by due date, no-show for tutoring session, inappropriate communication)..."
+                placeholder="e.g., Item not returned past agreed due date"
+                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Additional Details
+              </label>
+              <textarea
+                rows={3}
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+                placeholder="Describe what occurred with specific timestamps or messages..."
                 className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none"
               />
             </div>

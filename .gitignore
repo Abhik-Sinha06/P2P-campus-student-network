@@ -2,3 +2,5 @@ node_modules
 .db_fallback.json
 .env.local
 .next/
+ARCHITECTURE.md
+architecture_diagrams.html

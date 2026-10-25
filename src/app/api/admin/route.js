@@ -10,7 +10,17 @@ export async function GET(request) {
     }
 
     // 1. Fetch reports sorted by date raised (FR-3.5.1)
-    const reportsRes = await query('SELECT * FROM reports ORDER BY report_id DESC');
+    const reportsRes = await query(`
+      SELECT r.*,
+             u1.name AS reported_by_name,
+             u1.email AS reported_by_email,
+             u2.name AS reported_user_name,
+             u2.email AS reported_user_email
+      FROM reports r
+      LEFT JOIN users u1 ON r.reported_by_id = u1.user_id
+      LEFT JOIN users u2 ON r.reported_user_id = u2.user_id
+      ORDER BY r.report_id DESC
+    `);
 
     // 2. Fetch users summary
     const usersRes = await query('SELECT user_id, name, email, role, year, karma_balance, status, room_number, room_status FROM users ORDER BY user_id ASC');

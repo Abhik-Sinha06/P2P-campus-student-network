@@ -5,6 +5,25 @@ import path from 'path';
 let pool = null;
 let useFallback = false;
 let fallbackDb = null;
+let lastDbMtime = 0;
+
+function getFallbackDb() {
+  const dataFilePath = path.join(process.cwd(), '.db_fallback.json');
+  if (fs.existsSync(dataFilePath)) {
+    try {
+      const stat = fs.statSync(dataFilePath);
+      if (!fallbackDb || stat.mtimeMs !== lastDbMtime) {
+        fallbackDb = JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
+        lastDbMtime = stat.mtimeMs;
+      }
+    } catch (e) {
+      if (!fallbackDb) fallbackDb = initFallbackDb();
+    }
+  } else if (!fallbackDb) {
+    fallbackDb = initFallbackDb();
+  }
+  return fallbackDb;
+}
 
 // Initialize memory/file fallback database for out-of-the-box local testing
 function initFallbackDb() {
@@ -290,6 +309,8 @@ function saveFallbackDb() {
   const dataFilePath = path.join(process.cwd(), '.db_fallback.json');
   try {
     fs.writeFileSync(dataFilePath, JSON.stringify(fallbackDb, null, 2), 'utf8');
+    const stat = fs.statSync(dataFilePath);
+    lastDbMtime = stat.mtimeMs;
   } catch (e) {
     // ignore
   }
@@ -346,9 +367,7 @@ export async function query(text, params = []) {
 
 // Smart query router for fallback store to handle core operations
 function runFallbackQuery(sql, params) {
-  if (!fallbackDb) {
-    fallbackDb = initFallbackDb();
-  }
+  fallbackDb = getFallbackDb();
 
   const clean = sql.trim();
   const upper = clean.toUpperCase();
@@ -620,6 +639,11 @@ function runFallbackQuery(sql, params) {
   }
 
   if (upper.includes('FROM EXCHANGES')) {
+    if (upper.includes('COUNT(*)')) {
+      const uid = parseInt(params[0], 10);
+      const count = fallbackDb.exchanges.filter(e => (e.requester_id === uid || e.helper_id === uid) && e.status === 'completed').length;
+      return { rows: [{ completed_count: count }], rowCount: 1 };
+    }
     if (upper.includes('WHERE E.EXCHANGE_ID =') || upper.includes('WHERE EXCHANGE_ID =')) {
       const id = parseInt(params[0], 10);
       const ex = fallbackDb.exchanges.find(e => e.exchange_id === id);
